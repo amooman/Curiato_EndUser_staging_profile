@@ -1,0 +1,13 @@
+Package: curiato.enduser.staging.profile
+Title: Profile Dashboard for Curiato End User
+Version: 0.0.0.9000
+Authors@R: person('Zauad Shahreer', 'Abeer', email = 'shahreyar.abeer@gmail.com', role = c('cre', 'aut'))
+Description: It contains the inputs for the main profile.
+License: Apache License (>= 2.0)
+Imports: 
+    config,
+    golem,
+    shiny
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.1.1
