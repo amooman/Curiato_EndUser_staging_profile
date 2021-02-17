@@ -1,0 +1,54 @@
+
+
+
+
+html {
+  font-size: 62.5%;
+}
+body {
+  font-size: 1em;
+}
+
+@media (max-width: 300px) {
+    html { font-size: 70%; }
+}
+
+@media (min-width: 500px) {
+    html { font-size: 80%; }
+}
+
+@media (min-width: 800px) {
+    html { font-size: 110%; }
+}
+
+@media (min-width: 1200px) {
+    html { font-size: 130%; }
+}
+
+
+#main-feedback {
+  width: 100%;
+  text-align: center;
+}
+
+
+.ui.ui.ui.grey.label {
+  background-color: #D1D3D4;
+  border-color: #D1D3D4;
+  color: #000;
+}
+
+.ui.ui.ui.ui.mini.button {
+    font-size: .75rem;
+}
+
+.my-header {
+  border-width: 0px;
+}
+
+
+.footer {
+  position: fixed;
+  bottom: 45px;
+  font-size: .77rem;
+}

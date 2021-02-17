@@ -9,9 +9,84 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # List the first level UI elements here 
-    fluidPage(
-      h1("curiato.enduser.staging.profile")
+    
+    
+    
+    shiny.semantic::semanticPage(
+      div(
+        class = "ui grid",
+        # div(
+        #   class = "one wide column"
+        # ),
+        div(
+          class = "sixteen wide column",
+          div(
+            class = "ui segment",
+            style = "background: #D1D3D4;",
+            div(
+              class = "ui grid",
+              div(
+                class = "twelve wide column",
+                tags$img(src = "./www/logo.png", height = "45px", width = "200px")
+              ),
+              div(
+                class = "four wide column",
+                style = "padding-left: 1.65rem;",
+                uiOutput("update_time")
+              )
+            )
+          )
+        )
+      ),
+      
+      
+      shiny.semantic::tabset(
+        tabs = list(
+          # list(
+          #   menu = "Data",
+          #   content = mod_main_functionality_ui("main"),
+          #   id = "data"
+          # ),
+          list(
+            menu = "Profile",
+            content = mod_edit_data_ui("edit"),
+            id = "edit"
+          )
+          
+        )
+      ),
+      
+      
+      
+      
+      div(
+        class = "ui grid",
+        # div(
+        #   class = "one wide column"
+        # ),
+        div(
+          class = "five wide column",
+          div(
+            class = "footer",
+            #style = "",
+            "Smart Surface Monitoring Platform"
+          )
+        ),
+        div(
+          class = "seven wide column"
+        ),
+        div(
+          class = "four wide column",
+          div(
+            class = "footer",
+            #style = "position: fixed; bottom: 45px; font-size: 17px",
+            "©2021 Curiato, Inc. All Rights Reserved."
+          )
+        )
+      )
+      
     )
+    
   )
 }
 
@@ -33,7 +108,7 @@ golem_add_external_resources <- function(){
     favicon(),
     bundle_resources(
       path = app_sys('app/www'),
-      app_title = 'curiato.enduser.staging.profile'
+      app_title = 'nursing.app'
     )
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 

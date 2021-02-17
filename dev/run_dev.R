@@ -8,5 +8,9 @@ golem::detach_all_attached()
 # Document and reload your package
 golem::document_and_reload()
 
+# Open the app in external browser
+options(shiny.launch.browser = .rs.invokeShinyWindowExternal)
+
 # Run the application
 run_app()
+
