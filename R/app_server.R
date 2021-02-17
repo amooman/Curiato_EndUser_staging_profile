@@ -76,8 +76,5 @@ app_server <- function( input, output, session ) {
     tags$p("Last update: ", Sys.Date(), "| ", tags$b(format(r$update_time, "%I:%M %p")))
   })
   
-  
-  
-  mod_main_functionality_server("main", r)
   mod_edit_data_server("edit", r)
 }

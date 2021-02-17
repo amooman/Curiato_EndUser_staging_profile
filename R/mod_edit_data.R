@@ -78,7 +78,7 @@ mod_edit_data_server <- function(id, r){
           # ) %>% 
           DT::datatable(
             escape = 15,
-            editable = "row",
+            editable = list(target = "row", disable = list(columns = 15)),
             selection = "none",
             options = list(pageLength = 5)
           )
