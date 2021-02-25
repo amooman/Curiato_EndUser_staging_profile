@@ -10,21 +10,36 @@
 mod_edit_data_ui <- function(id){
   ns <- NS(id)
   tagList(
+    uiOutput(ns("modal")),
     div(
-      class = "ui grid",
+      class = "ui raised segment",
       div(
-        class = "twelve wide column",
+        class = "content",
+        DT::DTOutput(ns("table"))
+      ),
+      br(),
+      div(
+        class = "content",
+        style = "text-align: center;",
+        shiny.semantic::action_button(
+          input_id = ns("add_row"),
+          label = "Add Row",
+          class = "ui black mini button",
+          icon = icon("plus")
+        )
+      ),
+      div(
+        class = "ui grid",
         div(
-          class = "content",
-          DT::DTOutput(ns("table"))
+          class = "thirteen wide column"
         ),
         div(
-          class = "content",
-          style = "text-align: center;",
-          shiny.semantic::action_button(
-            input_id = ns("add_row"),
-            label = "Add Row",
-            class = "ui blue mini button"
+          class = "three wide column",
+          div(
+            tags$ul(
+              tags$li("Double-click on a row to start"),
+              tags$li("Ctrl + Enter to end")
+            )
           )
         )
       )
@@ -44,43 +59,128 @@ mod_edit_data_server <- function(id, r){
       
       r_this_mod = reactiveValues(
         data = NULL,
-        edited_data = NULL,
-        i = NULL,
-        edited_col = NULL,
-        edited_val = NULL,
-        edited_bed_location = NULL,
-        edits = 0
+        info = NULL,
+        active_status = NULL
       )
       
-      observeEvent(r$data, {
-        r_this_mod$data = r$data
+      #r$w = waiter::Waiter$new(id = "table")
+      
+      output$modal <- renderUI({
+        shiny.semantic::modal(
+          id = ns("add_row_modal"),
+          header = h4("Add New Row", style = "text-align: center;"),
+          footer = "",
+          class = "tiny",
+          settings = list(c("transition", "fade"), c("closable", "false"), c("autofocus", "false")),
+          #modal_tags = icon("ui close"),
+          shiny.semantic::form(
+            
+            shiny.semantic::field(
+              style = "text-align: center;",
+              tags$label("Gateway ID"),
+              textInput(
+                inputId = ns("gatewayid"),
+                label = "",
+                placeholder = "Required",
+                width = "100%"
+              )
+            ),
+            shiny.semantic::field(
+              style = "text-align: center;",
+              tags$label("Interface ID"),
+              textInput(
+                inputId = ns("interfaceid"),
+                label = "",
+                placeholder = "Required",
+                width = "100%"
+              )
+            ),
+            shiny.semantic::field(
+              style = "text-align: center;",
+              tags$label("Serial ID"),
+              textInput(
+                inputId = ns("serialid"),
+                label = "",
+                placeholder = "Required",
+                width = "100%"
+              )
+            ),
+            shiny.semantic::field(
+              style = "text-align: center;",
+              tags$label("Site ID"),
+              textInput(
+                inputId = ns("siteid"),
+                label = "",
+                placeholder = "Required",
+                width = "100%"
+              )
+            ),
+            shiny.semantic::field(
+              style = "text-align: center;",
+              tags$label("Bed Number"),
+              textInput(
+                inputId = ns("bed"),
+                label = "",
+                placeholder = "Optional",
+                width = "100%"
+              )
+            )
+          ),
+          br(),
+          div(
+            class = "ui grid",
+            div(
+              class = "eight wide column",
+              style = "text-align: right;",
+              shiny.semantic::action_button(
+                input_id = ns("add_row_submit"),
+                label = "Done",
+                class = "ui mini blue button"
+              ) %>% tagAppendAttributes(
+                onclick = sprintf("Shiny.setInputValue('%s', null)", ns("button"))
+              ),
+            ),
+            div(
+              class = "eight wide column",
+              style = "text-align: left;",
+              shiny.semantic::action_button(
+                input_id = ns("add_row_cancel"),
+                label = "Cancel",
+                class = "ui mini red button"
+              ) %>% tagAppendAttributes(
+                onclick = sprintf("Shiny.setInputValue('%s', null)", ns("button"))
+              ),
+            )
+            
+          )
+        )
       })
       
-      # observeEvent(input$button, {
-      #   print("!!!")
-      #   
-      # }, ignoreNULL = TRUE)
+      observeEvent(r$data, {
+        r_this_mod$data = r$data %>% 
+          dplyr::arrange(dplyr::desc(timestamp))
+      })
       
       output$table <- DT::renderDT({
-        
         data = cbind(
           r_this_mod$data,
+          active_sts = sapply(1:nrow(r_this_mod$data), active_switch_for_each_cell(ns("active"), r_this_mod$data$active)),
           submit = sapply(1:nrow(r_this_mod$data), button_for_each_cell("submit", "Submit", ns("button")))
-          #button_wrong = sapply(1:nrow(r$data), button_for_each_cell("wrong", "#D1D3D4", "Wrong", ns("button")))
-          #weight = list(list(rnorm(10), rnorm(10), rnorm(10), rnorm(10), rnorm(10), rnorm(10), rnorm(10)))
         )
         #print(data)
         #data = r$data
         data %>% 
-          # dplyr::select(
-          #   bed_location, sigposture, offload_time_in_mins, sigmoisture,
-          #   time_exposed_to_moisture, submit
-          # ) %>% 
+          dplyr::select(
+            -active
+          ) %>%
           DT::datatable(
-            escape = 15,
-            editable = list(target = "row", disable = list(columns = 15)),
+            escape = 1:14,
+            editable = list(target = "row", disable = list(columns = c(0:3, 8:10, 14, 15))),
             selection = "none",
-            options = list(pageLength = 5)
+            options = list(
+              pageLength = 5,
+              autoWidth = TRUE
+            )
           )
       })
       
@@ -89,100 +189,120 @@ mod_edit_data_server <- function(id, r){
       proxy = DT::dataTableProxy("table", session = session)
       
       observeEvent(input$table_cell_edit, {
-        req(is.null(r_this_mod$edited_val))
-        #input$button = NULL
+        #req(is.null(r_this_mod$info))
         
-        # data = r$data %>% 
-        #   dplyr::select(bed_location, sigposture, offload_time_in_mins, sigmoisture, time_exposed_to_moisture)
-        # 
-        colnames_data = colnames(r_this_mod$data)
-        
-        #edited_data = r_this_mod$data
-        
-        info = input$table_cell_edit[0:15, ]
-        #str(info)
-        print(info)
-        #info$col = info$col + 1
-        i = info$row[1]
-        j = info$col
-        v = info$value
-        
-        
-        #edited_col = colnames_data[j]
-        #edited_data[i] = DT::coerceValue(v, edited_data[i])
-        r_this_mod$data = DT::editData(r_this_mod$data, info, "table")
-        
-        r_this_mod$i = i
-        #r_this_mod$edited_col = edited_col
-        #r_this_mod$edited_val = v
-        #r_this_mod$edited_bed_location = edited_data$bed_location[i]
-        
-        
-        #print(edited_data)
-        #print(r_this_mod$edited_val)
-        #shinyjs::enable(id = paste0("button_submit_", i))
-        button = paste0("button_submit_", i)
-        print(button)
-        golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-        
-        r_this_mod$edited_data = r_this_mod$data
-        
-        print(r_this_mod$data)
-        
-        #DT::replaceData(proxy, x, resetPaging = FALSE)  # important
+        if (!is.null(r_this_mod$info) | !is.null(r_this_mod$active_status)) {
+          golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
+        } else {
+          #colnames_data = colnames(r_this_mod$data)
+          
+          info = input$table_cell_edit[1:14, ]
+          r_this_mod$info = info
+          print(info)
+          
+          i = info$row[1]
+          
+          button = paste0("button_submit_", i)
+          print(button)
+          golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+        }
       })
       
-      observeEvent(input$add_row, {
-        new_row = NA
-        r$data = rbind(new_row, r$data)
+      observeEvent(input$active, {
+        
+        if (!is.null(r_this_mod$info) | !is.null(r_this_mod$active_status)) {
+          golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
+        } else {
+          splitted <- strsplit(input$active, "_")[[1]]
+          row = strsplit(splitted[1], "-")[[1]][2] %>% as.numeric()
+          value = splitted[2]
+          r_this_mod$active_status = list(row = row, value = value)
+          
+          button = paste0("button_submit_", row)
+          if (r_this_mod$data$active[row] != value) {
+            golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+          } else {
+            golem::invoke_js("updateSelectedRowButton", list(button = button, value = TRUE))
+          }
+        }
       })
       
       observeEvent(input$button, {
-        req(r_this_mod$i)
         
-        
-        cat("r_this_mod$i: ")
-        print(r_this_mod$i)
-        
-        splitted <- strsplit(input$button, "_")[[1]]
-        row <- splitted[3]
-        cat("row: ")
-        print(row)
-        
-        r_this_mod$edits = r_this_mod$edits + 1
-        
-        if (r_this_mod$i == row) {
-          query = sprintf("UPDATE curiato_enduser_dashboard_prod
-                          SET timestamp = NOW(), %s = '%s'
-                          WHERE bed_location = '%s';",
-                         r_this_mod$edited_col, r_this_mod$edited_val, r_this_mod$edited_bed_location)
-          print(query)
-          #DBI::dbSendStatement(r$con, query)
+        if (!is.null(r_this_mod$active_status)) {
+          #cat("active_status: ")
+          #print(r_this_mod$active_status)
+          active = r_this_mod$active_status
           
+          if (active$value == "Yes") start_end = "start_date"
+          else start_end = "end_date"
+          
+          
+          query <- sprintf("UPDATE cur_app_device_profile
+                    SET timestamp = NOW(), active = '%s', %s = NOW()
+                    WHERE gatewayid = '%s';",
+                    active$value, start_end, r_this_mod$data$gatewayid[active$row])
+          print(query)
+          DBI::dbSendStatement(r$con, query)
+          
+          r_this_mod$active_status = NULL
+        } else if (!is.null(r_this_mod$info)) {
+          
+          
+          splitted <- strsplit(input$button, "_")[[1]]
+          row <- splitted[3] %>% as.numeric()
+          
+          values = r_this_mod$info$value
+          
+          query = sprintf("UPDATE cur_app_device_profile
+                          SET bednumber = '%s', room = '%s', floor = '%s', bltid = '%s', cellid = '%s', note = '%s'
+                          WHERE gatewayid = '%s';",
+                          values[6], values[7], values[8], values[12], values[13], values[14], values[2])
+          print(query)
+          DBI::dbSendStatement(r$con, query)
+          
+          button = paste0("button_submit_", row)
+          golem::invoke_js("updateSelectedRowButton", list(button = button, value = TRUE))
+          r_this_mod$info = NULL
         }
-        
-        r_this_mod$edited_val = NULL
-        
-        
-        
+        golem::invoke_js("updateButton", list(button = ns("button")))
+      })
+      # Row adding operations ---------------------------------------------------
+      
+      observeEvent(input$add_row, {
+        shiny.semantic::show_modal(ns("add_row_modal"))
       })
       
-      observeEvent(r_this_mod$edits, {
-        golem::invoke_js("updateButtons", list(value = TRUE))
-        golem::invoke_js("updateButton", list(button = ns("button")))
+      observeEvent(input$add_row_submit, {
+        
+        
+        shinyFeedback::feedbackDanger("gatewayid", input$gatewayid == "", "Needed!")
+        shinyFeedback::feedbackDanger("interfaceid", input$interfaceid == "", "Needed!")
+        shinyFeedback::feedbackDanger("serialid", input$serialid == "", "Needed!")
+        shinyFeedback::feedbackDanger("siteid", input$siteid == "", "Needed!")
+        req(input$gatewayid, input$interfaceid, input$serialid, input$siteid)
+        
+        shiny.semantic::hide_modal(ns("add_row_modal"))
+        ## DBQUERY
+        query = sprintf("INSERT INTO cur_app_device_profile VALUES 
+                        ('%s', '%s', '%s', %s, '%s',
+                        null, null, NOW(), 'No', null, null,
+                        null, null, null)",
+                        input$gatewayid, input$interfaceid, input$serialid, input$siteid, input$bed)
+        print(query)
+        DBI::dbSendStatement(r$con, query)
+        update_text_inputs(session = session)
+      })
+      
+      observeEvent(input$add_row_cancel, {
+        shiny.semantic::hide_modal(ns("add_row_modal"))
+        update_text_inputs(session = session)
       })
       
     }
   )
-  
-  
-  
- 
+
 }
     
-## To be copied in the UI
-# mod_edit_data_ui("edit_data_ui_1")
-    
-## To be copied in the server
-# callModule(mod_edit_data_server, "edit_data_ui_1")
+
  
