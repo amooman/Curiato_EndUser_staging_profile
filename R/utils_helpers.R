@@ -22,12 +22,23 @@ button_for_each_cell <- function(type, label, id){
   }
 }
 
-## making buttons for the table cells
-menu_button_for_each_cell <- function(type = "menu"){
+## checkboxes for active status
+active_switch_for_each_cell <- function(id, selected){
+  
   function(i){
+    selected_yes = selected_no = ""
+    if (selected[i] == "Yes") selected_yes = "selected"
+    else selected_no = "selected"
     sprintf(
-      '<button id="button_%s_%d" type="button" class="ui mini button" onclick="%s"><i class="fa fa-home"></i></button>', 
-      type, i, "Shiny.setInputValue('button', this.id);")
+      '<div class="form-group shiny-input-container">
+        <label class="control-label" for="id-%d"></label>
+        <div width="25px">
+          <select onclick="%s" id="id-%d"><option value="No" %s>No</option>
+      <option value="Yes" %s>Yes</option></select>
+          <script type="application/json" data-for="id-%d" data-nonempty="">{}</script>
+        </div>
+      </div>',
+      i, sprintf("Shiny.setInputValue('%s', this.id + '_' + this.value);", id), i, selected_no, selected_yes, i)
   }
 }
 
@@ -35,15 +46,6 @@ menu_button_for_each_cell <- function(type = "menu"){
 ## shinyjs code to disable buttons for the row clicked
 jsCode <- "shinyjs.disabled = function(button){document.getElementById(button).disabled = true;}"
 
-# insert_query <- "INSERT INTO public.curiato_enduser_dashboard_prod
-# (dev_gatewayid, dev_interfaceid, dev_serialid, device_status, device_status_timestamp, device_status_message, 'timestamp', bed_location, siteid, sigposture, stat_mobility, stat_moisture, stat_avgh_fullbed, stat_avgh_centbed, stat_avgt_fullbed, stat_avgt_centbed, stat_avgf_full, msg_wet_status_timestamp, msg_post_status_timestamp, wet_message_final_type, wet_message_final_status, post_message_final_type, post_message_final_status, time_since_offload, offload_updated_datetime, offload_time_in_mins, offload_alert_colours, sigmoisture, time_exposed_to_moisture)
-# VALUES('', '', '', '', '', '', '', '', 0, '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', '', 0, '', '', '');"
-
-
-
-# insert_query <- "INSERT INTO public.cur_app_clinical_feedback
-# (curiatoid, gatewayid, interfaceid, timestamp, feedback_type, bed_location, siteid, sigposture, offload_time_in_mins, offload_alert_colours, end_user_note)
-# VALUES('', '', '', '', '', '', 0, '', '', '', '');"
 
 # Render a bar chart with a label on the left
 bar_chart <- function(label, width = "100%", height = "14px", fill = "#00bfc4", background = NULL) {
@@ -69,7 +71,44 @@ insert_into_feedback_query <- function(feedback) {
 
 
 
-
+# update text inputs
+update_text_inputs <- function(session) {
+  updateTextInput(
+    session = session,
+    inputId = "gatewayid",
+    label = "",
+    value = "",
+    placeholder = "Required"
+  )
+  updateTextInput(
+    session = session,
+    inputId = "interfaceid",
+    label = "",
+    value = "",
+    placeholder = "Required"
+  )
+  updateTextInput(
+    session = session,
+    inputId = "serialid",
+    label = "",
+    value = "",
+    placeholder = "Required"
+  )
+  updateTextInput(
+    session = session,
+    inputId = "siteid",
+    label = "",
+    value = "",
+    placeholder = "Required"
+  )
+  updateTextInput(
+    session = session,
+    inputId = "bed",
+    label = "",
+    value = "",
+    placeholder = "Optional"
+  )
+}
 
 
 
