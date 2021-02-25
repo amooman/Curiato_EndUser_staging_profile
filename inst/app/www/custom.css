@@ -3,26 +3,26 @@
 
 
 html {
-  font-size: 62.5%;
+  font-size: 55.5%;
 }
 body {
   font-size: 1em;
 }
 
 @media (max-width: 300px) {
-    html { font-size: 70%; }
+    html { font-size: 65%; }
 }
 
 @media (min-width: 500px) {
-    html { font-size: 80%; }
+    html { font-size: 75%; }
 }
 
 @media (min-width: 800px) {
-    html { font-size: 110%; }
+    html { font-size: 105%; }
 }
 
 @media (min-width: 1200px) {
-    html { font-size: 130%; }
+    html { font-size: 125%; }
 }
 
 
@@ -49,6 +49,16 @@ body {
 
 .footer {
   position: fixed;
-  bottom: 45px;
+  bottom: 25px;
   font-size: .77rem;
+}
+
+.shiny-input-container:not(.shiny-input-container-inline) {
+    width: 100% !important;
+    max-width: 100%;
+}
+
+#edit-gatewayid, #edit-interfaceid, #edit-serialid, #edit-siteid, #edit-bed {
+  width: 70%;
+  height: 50px;
 }

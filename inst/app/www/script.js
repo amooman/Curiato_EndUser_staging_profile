@@ -14,4 +14,8 @@ $( document ).ready(function() {
     Shiny.setInputValue(arg.button, null);
   });
   
+  Shiny.addCustomMessageHandler('submitAlert', function(arg) {
+    alert(arg.message);
+  });
+  
 });
