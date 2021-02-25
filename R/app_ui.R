@@ -73,10 +73,10 @@ app_ui <- function(request) {
           )
         ),
         div(
-          class = "seven wide column"
+          class = "eight wide column"
         ),
         div(
-          class = "four wide column",
+          class = "three wide column",
           div(
             class = "footer",
             #style = "position: fixed; bottom: 45px; font-size: 17px",
@@ -108,8 +108,10 @@ golem_add_external_resources <- function(){
     favicon(),
     bundle_resources(
       path = app_sys('app/www'),
-      app_title = 'nursing.app'
-    )
+      app_title = 'curiat_enduser_staging_profile'
+    ),
+    shinyFeedback::useShinyFeedback(),
+    waiter::use_waiter(spinners = 7),
     # Add here other external resources
     # for example, you can add shinyalert::useShinyalert() 
   )
