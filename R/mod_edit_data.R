@@ -210,47 +210,70 @@ mod_edit_data_server <- function(id, r){
       
       observeEvent(input$active, {
         
-        if (!is.null(r_this_mod$info) | !is.null(r_this_mod$active_status)) {
-          golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
-        } else {
-          splitted <- strsplit(input$active, "_")[[1]]
-          row = strsplit(splitted[1], "-")[[1]][2] %>% as.numeric()
-          value = splitted[2]
-          r_this_mod$active_status = list(row = row, value = value)
-          
-          button = paste0("button_submit_", row)
-          if (r_this_mod$data$active[row] != value) {
-            golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-          } else {
-            golem::invoke_js("updateSelectedRowButton", list(button = button, value = TRUE))
-          }
-        }
+        splitted <- strsplit(input$active, "_")[[1]]
+        row = strsplit(splitted[1], "-")[[1]][2] %>% as.numeric()
+        value = splitted[2]
+        
+        selected <- paste0("id-", row)
+        button = paste0("button_submit_", row)
+        
+        golem::invoke_js("selectButtonDisable", list(selected = selected))
+        golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+        
+        
+        r_this_mod$active_status = list(row = row, value = value)
+        print(r_this_mod$active_status)
+        
+        # if (!is.null(r_this_mod$info)) {
+        #   golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
+        # } else {
+        #   splitted <- strsplit(input$active, "_")[[1]]
+        #   row = strsplit(splitted[1], "-")[[1]][2] %>% as.numeric()
+        #   value = splitted[2]
+        #   button = paste0("button_submit_", row)
+        #   
+        #   if (is.null(r_this_mod$active_status)) {
+        #     r_this_mod$active_status = list(row = row, value = value)
+        #   } else {
+        #     if (r_this_mod$active_status$row == row) {
+        #       if (r_this_mod$data$active[row] != value) {
+        #         golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+        #       } else {
+        #         golem::invoke_js("updateSelectedRowButton", list(button = button, value = TRUE))
+        #         r_this_mod$active_status = NULL
+        #       }
+        #     } else {
+        #       golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
+        #     }
+        #   }
+        # }
+        
       })
       
       observeEvent(input$button, {
         
+        splitted <- strsplit(input$button, "_")[[1]]
+        row <- splitted[3] %>% as.numeric()
+        
         if (!is.null(r_this_mod$active_status)) {
-          #cat("active_status: ")
-          #print(r_this_mod$active_status)
+          golem::invoke_js("selectButtonEnable", list(value = FALSE))
           active = r_this_mod$active_status
           
           if (active$value == "Yes") start_end = "start_date"
           else start_end = "end_date"
           
-          
-          query <- sprintf("UPDATE cur_app_device_profile
+          if (r_this_mod$data$active[row] != active$value) {
+            query <- sprintf("UPDATE cur_app_device_profile
                     SET timestamp = NOW(), active = '%s', %s = NOW()
                     WHERE gatewayid = '%s';",
                     active$value, start_end, r_this_mod$data$gatewayid[active$row])
-          print(query)
-          DBI::dbSendStatement(r$con, query)
+            print(query)
+            #DBI::dbSendStatement(r$con, query)
+          }
           
           r_this_mod$active_status = NULL
+          
         } else if (!is.null(r_this_mod$info)) {
-          
-          
-          splitted <- strsplit(input$button, "_")[[1]]
-          row <- splitted[3] %>% as.numeric()
           
           values = r_this_mod$info$value
           
@@ -259,12 +282,19 @@ mod_edit_data_server <- function(id, r){
                           WHERE gatewayid = '%s';",
                           values[6], values[7], values[8], values[12], values[13], values[14], values[2])
           print(query)
-          DBI::dbSendStatement(r$con, query)
+          #DBI::dbSendStatement(r$con, query)
           
-          button = paste0("button_submit_", row)
-          golem::invoke_js("updateSelectedRowButton", list(button = button, value = TRUE))
+          
           r_this_mod$info = NULL
         }
+        
+        
+        
+        button = paste0("button_submit_", row)
+        
+        print(button)
+        
+        golem::invoke_js("updateSelectedRowButton", list(button = button, value = TRUE))
         golem::invoke_js("updateButton", list(button = ns("button")))
       })
       # Row adding operations ---------------------------------------------------

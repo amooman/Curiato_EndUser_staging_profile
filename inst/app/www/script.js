@@ -2,6 +2,15 @@
 
 $( document ).ready(function() {
   
+  Shiny.addCustomMessageHandler('selectButtonDisable', function(arg) {
+    $('select').not('#' + arg.selected).prop('disabled', true);
+  });
+  
+  Shiny.addCustomMessageHandler('selectButtonEnable', function(arg) {
+    $('select').prop('disabled', arg.value);
+  });
+  
+  
   Shiny.addCustomMessageHandler('updateButtons', function(arg) {
     $(':button_submit').prop('disabled', arg.value);
   });
@@ -17,5 +26,7 @@ $( document ).ready(function() {
   Shiny.addCustomMessageHandler('submitAlert', function(arg) {
     alert(arg.message);
   });
+  
+  
   
 });
