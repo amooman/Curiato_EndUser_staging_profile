@@ -37,8 +37,8 @@ mod_edit_data_ui <- function(id){
           class = "three wide column",
           div(
             tags$ul(
-              tags$li("Double-click on a row to start"),
-              tags$li("Ctrl + Enter to end")
+              tags$li(tags$code("Double-click"), "on a row to start"),
+              tags$li(tags$code("Ctrl + Enter"), "when done/", tags$code("Esc"), "to cancel"),
             )
           )
         )
@@ -192,7 +192,18 @@ mod_edit_data_server <- function(id, r){
         #req(is.null(r_this_mod$info))
         
         if (!is.null(r_this_mod$info) | !is.null(r_this_mod$active_status)) {
-          golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
+          
+          info = input$table_cell_edit[1:14, ]
+          i = info$row[1]
+          
+          if (i == r_this_mod$active_row | i == r_this_mod$edited_row) {
+            button = paste0("button_submit_", i)
+            print(button)
+            golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+            r_this_mod$info = info
+          } else {
+            golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
+          }
         } else {
           #colnames_data = colnames(r_this_mod$data)
           
@@ -201,6 +212,7 @@ mod_edit_data_server <- function(id, r){
           print(info)
           
           i = info$row[1]
+          r_this_mod$edited_row <- i
           
           button = paste0("button_submit_", i)
           print(button)
@@ -213,6 +225,7 @@ mod_edit_data_server <- function(id, r){
         splitted <- strsplit(input$active, "_")[[1]]
         row = strsplit(splitted[1], "-")[[1]][2] %>% as.numeric()
         value = splitted[2]
+        r_this_mod$active_row <- row
         
         selected <- paste0("id-", row)
         button = paste0("button_submit_", row)
@@ -224,36 +237,19 @@ mod_edit_data_server <- function(id, r){
         r_this_mod$active_status = list(row = row, value = value)
         print(r_this_mod$active_status)
         
-        # if (!is.null(r_this_mod$info)) {
-        #   golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
-        # } else {
-        #   splitted <- strsplit(input$active, "_")[[1]]
-        #   row = strsplit(splitted[1], "-")[[1]][2] %>% as.numeric()
-        #   value = splitted[2]
-        #   button = paste0("button_submit_", row)
-        #   
-        #   if (is.null(r_this_mod$active_status)) {
-        #     r_this_mod$active_status = list(row = row, value = value)
-        #   } else {
-        #     if (r_this_mod$active_status$row == row) {
-        #       if (r_this_mod$data$active[row] != value) {
-        #         golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-        #       } else {
-        #         golem::invoke_js("updateSelectedRowButton", list(button = button, value = TRUE))
-        #         r_this_mod$active_status = NULL
-        #       }
-        #     } else {
-        #       golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
-        #     }
-        #   }
-        # }
-        
       })
       
       observeEvent(input$button, {
         
         splitted <- strsplit(input$button, "_")[[1]]
         row <- splitted[3] %>% as.numeric()
+        
+        edited_row <- r$data[row, 1:3]
+        rmarkdown::render(
+          "./inst/shiny_to_shell.Rmd",
+          output_file = "shiny_to_shell.html",
+          params = list(data = edited_row)
+        )
         
         if (!is.null(r_this_mod$active_status)) {
           golem::invoke_js("selectButtonEnable", list(value = FALSE))
