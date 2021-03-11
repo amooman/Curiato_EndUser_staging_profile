@@ -1,0 +1,25 @@
+---
+title: "From shiny to shell"
+author: "Dr. Nasser Mooman, Zauad Shahreer Abeer"
+date: "3/11/2021"
+output: html_document
+params:
+  data: NA
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r}
+Sys.setenv(GW = params$data$gatewayid, x = 'this')
+```
+
+
+```{bash}
+echo $GW
+echo $x
+```
+
