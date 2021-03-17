@@ -54,36 +54,36 @@ app_ui <- function(request) {
           )
           
         )
-      ),
-      
-      
-      
-      
-      div(
-        class = "ui grid",
-        # div(
-        #   class = "one wide column"
-        # ),
-        div(
-          class = "five wide column",
-          div(
-            class = "footer",
-            #style = "",
-            "Smart Surface Monitoring Platform"
-          )
-        ),
-        div(
-          class = "eight wide column"
-        ),
-        div(
-          class = "three wide column",
-          div(
-            class = "footer",
-            #style = "position: fixed; bottom: 45px; font-size: 17px",
-            "©2021 Curiato, Inc. All Rights Reserved."
-          )
-        )
       )
+      
+      
+      
+      
+      # div(
+      #   class = "ui grid",
+      #   # div(
+      #   #   class = "one wide column"
+      #   # ),
+      #   div(
+      #     class = "five wide column",
+      #     div(
+      #       class = "footer",
+      #       #style = "",
+      #       "Smart Surface Monitoring Platform"
+      #     )
+      #   ),
+      #   div(
+      #     class = "eight wide column"
+      #   ),
+      #   div(
+      #     class = "three wide column",
+      #     div(
+      #       class = "footer",
+      #       #style = "position: fixed; bottom: 45px; font-size: 17px",
+      #       "©2021 Curiato, Inc. All Rights Reserved."
+      #     )
+      #   )
+      # )
       
     )
     
