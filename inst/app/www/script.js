@@ -27,6 +27,4 @@ $( document ).ready(function() {
     alert(arg.message);
   });
   
-  
-  
 });
