@@ -38,7 +38,7 @@ mod_edit_data_ui <- function(id){
           div(
             tags$ul(
               tags$li(tags$code("Double-click"), "on a row to start"),
-              tags$li(tags$code("Ctrl + Enter"), "when done/", tags$code("Esc"), "to cancel"),
+              tags$li(tags$code("Enter"), "when done/", tags$code("Esc"), "to cancel"),
             )
           )
         )
