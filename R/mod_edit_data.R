@@ -173,13 +173,19 @@ mod_edit_data_server <- function(id, r){
           dplyr::select(
             -active
           ) %>%
+          dplyr::mutate(
+            timestamp = as.character(timestamp),
+            start_date = as.character(start_date),
+            end_date = as.character(end_date)
+          ) %>% 
           DT::datatable(
-            escape = 1:14,
-            editable = list(target = "row", disable = list(columns = c(0:3, 8:10, 14, 15))),
+            escape = 1:13,
+            editable = list(target = "row", disable = list(columns = c(0, 14, 15))),
             selection = "none",
             options = list(
               pageLength = 5,
-              autoWidth = TRUE
+              autoWidth = TRUE,
+              scrollX = TRUE
             )
           )
       })
@@ -191,33 +197,44 @@ mod_edit_data_server <- function(id, r){
       observeEvent(input$table_cell_edit, {
         #req(is.null(r_this_mod$info))
         
-        if (!is.null(r_this_mod$info) | !is.null(r_this_mod$active_status)) {
-          
-          info = input$table_cell_edit[1:14, ]
-          i = info$row[1]
-          
-          if (i == r_this_mod$active_row | i == r_this_mod$edited_row) {
-            button = paste0("button_submit_", i)
-            print(button)
-            golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-            r_this_mod$info = info
-          } else {
-            golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
-          }
-        } else {
-          #colnames_data = colnames(r_this_mod$data)
-          
-          info = input$table_cell_edit[1:14, ]
-          r_this_mod$info = info
-          print(info)
-          
-          i = info$row[1]
-          r_this_mod$edited_row <- i
-          
-          button = paste0("button_submit_", i)
-          print(button)
-          golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-        }
+        info = input$table_cell_edit[1:14, ]
+        r_this_mod$info = info
+        print(info)
+        
+        i = info$row[1]
+        r_this_mod$edited_row <- i
+        
+        button = paste0("button_submit_", i)
+        print(button)
+        golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+        
+        # if (!is.null(r_this_mod$info) | !is.null(r_this_mod$active_status)) {
+        #   
+        #   info = input$table_cell_edit[1:14, ]
+        #   i = info$row[1]
+        #   
+        #   if (i == r_this_mod$active_row | i == r_this_mod$edited_row) {
+        #     button = paste0("button_submit_", i)
+        #     print(button)
+        #     golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+        #     r_this_mod$info = info
+        #   } else {
+        #     golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
+        #   }
+        # } else {
+        #   #colnames_data = colnames(r_this_mod$data)
+        #   
+        #   info = input$table_cell_edit[1:14, ]
+        #   r_this_mod$info = info
+        #   print(info)
+        #   
+        #   i = info$row[1]
+        #   r_this_mod$edited_row <- i
+        #   
+        #   button = paste0("button_submit_", i)
+        #   print(button)
+        #   golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
+        # }
       })
       
       observeEvent(input$active, {
