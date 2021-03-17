@@ -17,7 +17,7 @@ NULL
 button_for_each_cell <- function(type, label, id){
   function(i){
     sprintf(
-      '<button id="button_%s_%d" type="button" disabled class="ui mini red button" onclick="%s">%s</button>', 
+      '<button id="button_%s_%d" type="button" disabled class="ui mini red button submitButton" onclick="%s">%s</button>', 
       type, i, sprintf("Shiny.setInputValue('%s', this.id);", id), label)
   }
 }
