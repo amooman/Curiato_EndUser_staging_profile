@@ -183,9 +183,11 @@ mod_edit_data_server <- function(id, r){
             editable = list(target = "row", disable = list(columns = c(0, 14, 15))),
             selection = "none",
             options = list(
-              pageLength = 5,
+              dom = "fti",
+              pageLength = 15,
               autoWidth = TRUE,
-              scrollX = TRUE
+              scrollX = TRUE,
+              fontSize = "80%"
             )
           )
       })
@@ -261,7 +263,7 @@ mod_edit_data_server <- function(id, r){
         splitted <- strsplit(input$button, "_")[[1]]
         row <- splitted[3] %>% as.numeric()
         
-        edited_row <- r$data[row, 1:3]
+        edited_row <- r_this_mod$data[row, 1:3]
         rmarkdown::render(
           "./inst/shiny_to_shell.Rmd",
           output_file = "shiny_to_shell.html",
@@ -281,7 +283,7 @@ mod_edit_data_server <- function(id, r){
                     WHERE gatewayid = '%s';",
                     active$value, start_end, r_this_mod$data$gatewayid[active$row])
             print(query)
-            #DBI::dbSendStatement(r$con, query)
+            DBI::dbSendStatement(r$con, query)
           }
           
           r_this_mod$active_status = NULL
@@ -295,7 +297,7 @@ mod_edit_data_server <- function(id, r){
                           WHERE gatewayid = '%s';",
                           values[6], values[7], values[8], values[12], values[13], values[14], values[2])
           print(query)
-          #DBI::dbSendStatement(r$con, query)
+          DBI::dbSendStatement(r$con, query)
           
           
           r_this_mod$info = NULL
