@@ -6,6 +6,8 @@
 #' @noRd
 app_server <- function( input, output, session ) {
   # List the first level callModules here
+  
+  Sys.setenv(TZ = "America/Toronto")
 
   r = reactiveValues(
     data = NULL,
