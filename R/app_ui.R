@@ -13,48 +13,111 @@ app_ui <- function(request) {
     
     
     shiny.semantic::semanticPage(
-      div(
-        class = "ui grid",
-        # div(
-        #   class = "one wide column"
-        # ),
-        div(
-          class = "sixteen wide column",
+      
+      
+      shiny.semantic::grid(
+        myGridTemplate,
+        header = div(
+          class = "ui grid",
           div(
-            class = "ui segment",
-            style = "background: #D1D3D4;",
+            class = "sixteen wide column",
             div(
-              class = "ui grid",
+              class = "ui segment",
+              style = "background: #D1D3D4;",
               div(
-                class = "twelve wide column",
-                tags$img(src = "./www/logo.png", height = "45px", width = "200px")
-              ),
-              div(
-                class = "four wide column",
-                style = "padding-left: 1.65rem;",
-                uiOutput("update_time")
+                class = "ui grid",
+                div(
+                  class = "twelve wide column",
+                  tags$img(src = "./www/logo.png", height = "45px", width = "200px")
+                ),
+                div(
+                  class = "four wide column",
+                  style = "padding-left: 1.65rem;",
+                  uiOutput("update_time")
+                )
               )
             )
           )
-        )
-      ),
-      
-      
-      shiny.semantic::tabset(
-        tabs = list(
-          # list(
-          #   menu = "Data",
-          #   content = mod_main_functionality_ui("main"),
-          #   id = "data"
-          # ),
-          list(
-            menu = "Profile",
-            content = mod_edit_data_ui("edit"),
-            id = "edit"
+        ),
+        
+        main = mod_edit_data_ui("edit"),
+        
+        # main = shiny.semantic::tabset(
+        #   tabs = list(
+        #     list(
+        #       menu = "Data",
+        #       content = mod_main_functionality_ui("main"),
+        #       id = "data"
+        #     ),
+        #     list(
+        #       menu = "Edit",
+        #       content = mod_edit_data_ui("edit"),
+        #       id = "edit"
+        #     )
+        #     
+        #   )
+        # ),
+        footer = div(
+          class = "ui grid",
+          style = "margin-top: 7px;",
+          div(
+            class = "eight wide column",
+            div(
+              class = "footer",
+              "Smart Surface Monitoring Platform"
+            )
+          ),
+          div(
+            class = "eight wide column",
+            div(
+              class = "footer",
+              style = "float:right;",
+              "©2021 Curiato, Inc. All Rights Reserved."
+            )
           )
-          
         )
       )
+      
+      
+      
+      
+      # div(
+      #   class = "ui grid",
+      #   # div(
+      #   #   class = "one wide column"
+      #   # ),
+      #   div(
+      #     class = "sixteen wide column",
+      #     div(
+      #       class = "ui segment",
+      #       style = "background: #D1D3D4;",
+      #       div(
+      #         class = "ui grid",
+      #         div(
+      #           class = "twelve wide column",
+      #           tags$img(src = "./www/logo.png", height = "45px", width = "200px")
+      #         ),
+      #         div(
+      #           class = "four wide column",
+      #           style = "padding-left: 1.65rem;",
+      #           uiOutput("update_time")
+      #         )
+      #       )
+      #     )
+      #   )
+      # ),
+      
+      
+      # shiny.semantic::tabset(
+      #   tabs = list(
+      #     list(
+      #       menu = "Profile",
+      #       content = mod_edit_data_ui("edit"),
+      #       id = "edit"
+      #     )
+      #     
+      #   )
+      # )
       
       
       

@@ -112,5 +112,25 @@ update_text_inputs <- function(session) {
 
 
 
+myGridTemplate <- shiny.semantic::grid_template(
+  default = list(
+    areas = rbind(
+      c("header"),
+      c("main"),
+      c("footer")
+    ),
+    cols_width = c("100%"),
+    rows_height = c("100px", "auto", "50px")
+  ),
+  mobile = list(
+    areas = rbind(
+      c("header"),
+      c("main"),
+      c("footer")
+    ),
+    rows_height = c("80px", "auto", "40px"),
+    cols_width = c("100%")
+  )
+)
 
 

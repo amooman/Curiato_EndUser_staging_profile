@@ -31,14 +31,15 @@ mod_edit_data_ui <- function(id){
       div(
         class = "ui grid",
         div(
-          class = "thirteen wide column"
+          class = "two wide column"
         ),
         div(
-          class = "three wide column",
+          class = "fourteen wide column",
           div(
             tags$ul(
-              tags$li(tags$code("Double-click"), "on a row to start"),
-              tags$li(tags$code("Enter"), "when done/", tags$code("Esc"), "to cancel"),
+              style = "float:right;",
+              tags$li(tags$code("Double-click"), "on a row to start editing", style = "font-size: .9rem"),
+              tags$li(tags$code("Enter"), "when done/", tags$code("Esc"), "to cancel", style = "font-size: .9rem"),
             )
           )
         )
