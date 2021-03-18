@@ -48,9 +48,7 @@ body {
 
 
 .footer {
-  position: fixed;
-  bottom: 25px;
-  font-size: .77rem;
+  font-size: .67rem;
 }
 
 .shiny-input-container:not(.shiny-input-container-inline) {
