@@ -19,14 +19,29 @@ mod_edit_data_ui <- function(id){
       ),
       br(),
       div(
-        class = "content",
-        style = "text-align: center;",
-        shiny.semantic::action_button(
-          input_id = ns("add_row"),
-          label = "Add Row",
-          class = "ui black mini button",
-          icon = icon("plus")
-        )
+        class = "ui grid",
+        div(class = "six wide column"),
+        div(
+          class = "two wide column",
+          style = "text-align: center;",
+          shiny.semantic::action_button(
+            input_id = ns("add_row"),
+            label = "Add Row",
+            class = "ui black mini button",
+            icon = icon("plus")
+          )
+        ),
+        div(
+          class = "two wide column",
+          style = "text-align: center;",
+          shiny.semantic::action_button(
+            input_id = ns("delete_row"),
+            label = "Delete Row",
+            class = "ui black mini button",
+            icon = icon("minus")
+          )
+        ),
+        div(class = "six wide column")
       ),
       div(
         class = "ui grid",
@@ -40,6 +55,7 @@ mod_edit_data_ui <- function(id){
               style = "float:right;",
               tags$li(tags$code("Double-click"), "on a row to start editing", style = "font-size: .9rem"),
               tags$li(tags$code("Enter"), "when done/", tags$code("Esc"), "to cancel", style = "font-size: .9rem"),
+              tags$li(tags$code("Hit Delete Row"), "to delete selected row", style = "font-size: .9rem")
             )
           )
         )
@@ -158,8 +174,7 @@ mod_edit_data_server <- function(id, r){
       })
       
       observeEvent(r$data, {
-        r_this_mod$data = r$data %>% 
-          dplyr::arrange(dplyr::desc(timestamp))
+        r_this_mod$data = r$data
       })
       
       output$table <- DT::renderDT({
@@ -182,7 +197,7 @@ mod_edit_data_server <- function(id, r){
           DT::datatable(
             escape = 1:13,
             editable = list(target = "row", disable = list(columns = c(0, 14, 15))),
-            selection = "none",
+            selection = "single",
             options = list(
               dom = "fti",
               pageLength = 15,
@@ -210,34 +225,6 @@ mod_edit_data_server <- function(id, r){
         button = paste0("button_submit_", i)
         print(button)
         golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-        
-        # if (!is.null(r_this_mod$info) | !is.null(r_this_mod$active_status)) {
-        #   
-        #   info = input$table_cell_edit[1:14, ]
-        #   i = info$row[1]
-        #   
-        #   if (i == r_this_mod$active_row | i == r_this_mod$edited_row) {
-        #     button = paste0("button_submit_", i)
-        #     print(button)
-        #     golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-        #     r_this_mod$info = info
-        #   } else {
-        #     golem::invoke_js("submitAlert", list(message = "Please submit the previous changes!"))
-        #   }
-        # } else {
-        #   #colnames_data = colnames(r_this_mod$data)
-        #   
-        #   info = input$table_cell_edit[1:14, ]
-        #   r_this_mod$info = info
-        #   print(info)
-        #   
-        #   i = info$row[1]
-        #   r_this_mod$edited_row <- i
-        #   
-        #   button = paste0("button_submit_", i)
-        #   print(button)
-        #   golem::invoke_js("updateSelectedRowButton", list(button = button, value = FALSE))
-        # }
       })
       
       observeEvent(input$active, {
@@ -343,6 +330,27 @@ mod_edit_data_server <- function(id, r){
       observeEvent(input$add_row_cancel, {
         shiny.semantic::hide_modal(ns("add_row_modal"))
         update_text_inputs(session = session)
+      })
+      
+      observeEvent(input$table_rows_selected, {
+        print(input$table_rows_selected)
+      })
+      
+      observeEvent(input$delete_row, {
+        req(input$table_rows_selected)
+        selected = input$table_rows_selected
+        data = r$data
+        to_delete = r$data[selected, ]
+        print(to_delete)
+        data = data[-selected, ]
+        r$data = data
+        
+        query = sprintf(
+          "DELETE FROM cur_app_device_profile WHERE gatewayid = '%s';",
+          to_delete$gatewayid
+        )
+        print(query)
+        DBI::dbSendStatement(r$con, query)
       })
       
     }

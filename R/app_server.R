@@ -43,7 +43,9 @@ app_server <- function( input, output, session ) {
       #print("invalidating...")
       w$show()
       r$update_time = Sys.time()
-      dplyr::tbl(con, "cur_app_device_profile") %>% dplyr::collect()
+      dplyr::tbl(con, "cur_app_device_profile") %>%
+        dplyr::collect() %>% 
+        dplyr::arrange(dplyr::desc(timestamp))
     }
   )
   
