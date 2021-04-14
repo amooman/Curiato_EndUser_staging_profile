@@ -55,7 +55,7 @@ mod_edit_data_ui <- function(id){
               style = "float:right;",
               tags$li(tags$code("Double-click"), "on a row to start editing", style = "font-size: .9rem"),
               tags$li(tags$code("Enter"), "when done/", tags$code("Esc"), "to cancel", style = "font-size: .9rem"),
-              tags$li(tags$code("Hit Delete Row"), "to delete selected row", style = "font-size: .9rem")
+              tags$li(tags$code("Delete row"), "to delete selected row", style = "font-size: .9rem")
             )
           )
         )
@@ -332,9 +332,6 @@ mod_edit_data_server <- function(id, r){
         update_text_inputs(session = session)
       })
       
-      observeEvent(input$table_rows_selected, {
-        print(input$table_rows_selected)
-      })
       
       observeEvent(input$delete_row, {
         req(input$table_rows_selected)
